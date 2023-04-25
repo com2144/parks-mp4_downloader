@@ -1,6 +1,9 @@
-from Mp4Download.model import DownLoadModel
-from Mp4Download.view import DownLoadMainView
-from Mp4Download.view import BrowseDialog
+#!/usr/bin/env python
+# :coding: utf-8
+
+from model import DownLoadModel
+from view import DownLoadMainView
+from view import BrowseDialog
 from PySide2.QtWidgets import *
 import sys
 from shotgun_api3 import Shotgun
