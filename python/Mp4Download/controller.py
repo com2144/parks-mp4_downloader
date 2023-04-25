@@ -53,6 +53,7 @@ class DownLoadController:
 
     def on_ok_button_clicked(self):
         self.show_warning('Mp4 file save!')
+        self.browse_sig = False
 
     def on_cancel_button_clicked(self):
         self.main_window.close()
@@ -67,13 +68,26 @@ class DownLoadController:
         msg_box.exec_()
 
 def main():
-    app = QApplication()
+    app = QApplication(sys.argv)
     window = QMainWindow()
     controller = DownLoadController(window)
     window.setCentralWidget(controller.view)
     window.setWindowTitle('Mp4 Downloader')
     window.show()
-    app.exec_()
+    sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
+
+# def main():
+#     app = QApplication()
+#     window = QMainWindow()
+#     controller = DownLoadController(window)
+#     window.setCentralWidget(controller.view)
+#     window.setWindowTitle('Mp4 Downloader')
+#     window.show()
+#     app.exec_()
+#
+# if __name__ == '__main__':
+#     main()
