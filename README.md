@@ -1,2 +1,2 @@
-# parks-mp4_downloader-shotgrid-
+# parks-mp4_downloader
 mp4 downloader use shotgrid
