@@ -18,13 +18,35 @@ import logging as logger
 from shotgun_api3 import shotgun
 
 
+class ShotgunActionException(Exception):
+    pass
+
+
 class DownLoadController:
-    def __init__(self, main_window):
-        sg_act = ShotgunAction(sys.argv[1])
-        self.sg = sg_act.sg
-        self.entity_type = sg_act.entity_type
-        self.ids_filter = sg_act.ids_filter
-        self.ids = sg_act.ids
+    def __init__(self, main_window, url):
+        shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
+        scripts_name = "script psj"
+        scripts_key = "sck0fjGpgxoswuz)ibsnypzek"
+
+        self.sg = shotgun.Shotgun(shotgrid_url, script_name=scripts_name, api_key=scripts_key)
+
+        self.log_file = ''
+        self.log_file_setting()
+        self.logger = self._init_log(self.log_file)
+        self.url = url
+        self.protocol, self.action, self.params = self._parse_url()
+        self.entity_type = ''
+        self.project = None
+        self.columns = None
+        self.column_display_names = None
+        self.ids = []
+        self.ids_filter = []
+        self.selected_ids = []
+        self.selected_ids_filter = []
+        self.sort = None
+        self.title = []
+        self.user = None
+        self.session_uuid = []
 
         model = DownLoadModel()
         self.main_window = main_window
@@ -37,6 +59,7 @@ class DownLoadController:
         self.browse_sig = False
 
         self.main_ui()
+        self.log_set()
 
     def main_ui(self):
         self.view.path_line_edit.setPlaceholderText("Select the save folder")
@@ -56,66 +79,7 @@ class DownLoadController:
 
         self.view.setLayout(self.view.main_vbox_layout)
 
-    def on_browse_button_clicked(self):
-        self.browse_sig = True
-
-        if self.dialog is not None:
-            self.dialog.close()
-
-        browse_option = BrowseDialog()
-        self.path = browse_option.option
-
-        if not self.path:
-            self.show_warning('Choose the directory')
-        else:
-            self.view.path_line_edit.setText(self.path)
-
-    def on_ok_button_clicked(self):
-        self.download_url_file()
-        self.show_warning('Mp4 file save!')
-        self.browse_sig = False
-
-    def on_cancel_button_clicked(self):
-        self.main_window.close()
-
-    @staticmethod
-    def show_warning(error_message):
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Warning)
-        msg_box.setWindowTitle("Done")
-        msg_box.setText(f"{error_message}")
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.exec_()
-
-    def download_url_file(self):
-        version_fields = ["id", "sg_uploaded_movie"]
-        version = self.sg.find(self.entity_type, self.ids_filter, fields=version_fields)
-        if version and "sg_uploaded_movie" in version:
-            attachment_id = version["sg_uploaded_movie"]["id"]
-            attachment_name = version["sg_uploaded_movie"]["name"]
-            url = self.sg.get_attachment_download_url(attachment_id, attachment_name)
-            local_path = self.path + attachment_name
-            urllib.request.urlretrieve(url, local_path)
-
-
-class ShotgunActionException(Exception):
-    pass
-
-
-class ShotgunAction:
-    def __init__(self, url):
-        shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
-        scripts_name = "script psj"
-        scripts_key = "sck0fjGpgxoswuz)ibsnypzek"
-
-        self.sg = shotgun.Shotgun(shotgrid_url, script_name=scripts_name, api_key=scripts_key)
-
-        self.log_file = ''
-        self.log_file_setting()
-        self.logger = self._init_log(self.log_file)
-        self.url = url
-        self.protocol, self.action, self.params = self._parse_url()
-
+    def log_set(self):
         # entity type that the page was displaying
         self.entity_type = self.params["entity_type"]
 
@@ -126,9 +90,6 @@ class ShotgunAction:
                 "id": int(self.params["project_id"]),
                 "name": self.params["project_name"],
             }
-        else:
-            self.project = None
-
         # Internal column names currently displayed on the page
         self.columns = self.params["cols"]
 
@@ -136,7 +97,7 @@ class ShotgunAction:
         self.column_display_names = self.params["column_display_names"]
 
         # All ids of the entities returned by the query (not just those visible on the page)
-        self.ids = []
+
         if len(self.params["ids"]) > 0:
             ids = self.params["ids"].split(",")
             self.ids = [int(id) for id in ids]
@@ -146,7 +107,6 @@ class ShotgunAction:
         self.ids_filter = self._convert_ids_to_filter(self.ids)
 
         # ids of entities that were currently selected
-        self.selected_ids = []
         if len(self.params["selected_ids"]) > 0:
             sids = self.params["selected_ids"].split(",")
             self.selected_ids = [int(id) for id in sids]
@@ -162,8 +122,6 @@ class ShotgunAction:
                 "column": self.params["sort_column"],
                 "direction": self.params["sort_direction"],
             }
-        else:
-            self.sort = None
 
         # title of the page
         self.title = self.params["title"]
@@ -181,7 +139,8 @@ class ShotgunAction:
         else:
             self.log_file = log_dir + os.sep + 'shotgun_action.log'
 
-    def _init_log(self, filename='shotgun_action.log'):
+    @staticmethod
+    def _init_log(filename):
         try:
             logger.basicConfig(
                 level=logger.DEBUG,
@@ -232,22 +191,61 @@ class ShotgunAction:
         logger.debug("parsed ids into: %s" % filter)
         return filter
 
+    def on_browse_button_clicked(self):
+        self.browse_sig = True
+
+        if self.dialog is not None:
+            self.dialog.close()
+
+        browse_option = BrowseDialog()
+        self.path = browse_option.option
+
+        if not self.path:
+            self.show_warning('Choose the directory')
+        else:
+            self.view.path_line_edit.setText(self.path)
+
+    def on_ok_button_clicked(self):
+        self.download_url_file()
+        self.show_warning('Mp4 file save!')
+        self.browse_sig = False
+
+    def on_cancel_button_clicked(self):
+        self.main_window.close()
+
+    @staticmethod
+    def show_warning(error_message):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle("Done")
+        msg_box.setText(f"{error_message}")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
+
+    def download_url_file(self):
+        version_fields = ["id", "sg_uploaded_movie"]
+        version = self.sg.find(self.entity_type, self.ids_filter, fields=version_fields)
+        if version and "sg_uploaded_movie" in version:
+            attachment_id = version["sg_uploaded_movie"]["id"]
+            attachment_name = version["sg_uploaded_movie"]["name"]
+            url = self.sg.get_attachment_download_url(attachment_id, attachment_name)
+            local_path = self.path + attachment_name
+            urllib.request.urlretrieve(url, local_path)
+
 
 def main():
     try:
-        sa = ShotgunAction(sys.argv[1])
+        app = QApplication(sys.argv)
+        window = QMainWindow()
+        controller = DownLoadController(window, sys.argv[1])
+        window.setCentralWidget(controller.view)
+        window.setWindowTitle('Mp4 Downloader')
+        window.show()
+        sys.exit(app.exec_())
         logger.info("ShotgunAction: Firing... %s" % (sys.argv[1]))
     except IndexError as e:
         raise ShotgunActionException("Missing GET arguments")
     logger.info("ShotgunAction process finished.")
-
-    app = QApplication(sys.argv)
-    window = QMainWindow()
-    controller = DownLoadController(window)
-    window.setCentralWidget(controller.view)
-    window.setWindowTitle('Mp4 Downloader')
-    window.show()
-    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
