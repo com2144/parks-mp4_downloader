@@ -25,8 +25,8 @@ class ShotgunActionException(Exception):
 class DownLoadController:
     def __init__(self, main_window, url):
         shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
-        scripts_name = "script psj"
-        scripts_key = "sck0fjGpgxoswuz)ibsnypzek"
+        scripts_name = "script_psj"
+        scripts_key = "qJq9qnmuv*aaxqkulybgdymlr"
 
         self.sg = shotgun.Shotgun(shotgrid_url, script_name=scripts_name, api_key=scripts_key)
 
@@ -39,9 +39,9 @@ class DownLoadController:
         self.project = None
         self.columns = None
         self.column_display_names = None
-        self.ids = []
+        self.ids = ''
         self.ids_filter = []
-        self.selected_ids = []
+        self.selected_ids = ''
         self.selected_ids_filter = []
         self.sort = None
         self.title = []
@@ -224,13 +224,10 @@ class DownLoadController:
 
     def download_url_file(self):
         version_fields = ["id", "sg_uploaded_movie"]
-        version = self.sg.find(self.entity_type, self.ids_filter, fields=version_fields)
-        if version and "sg_uploaded_movie" in version:
-            attachment_id = version["sg_uploaded_movie"]["id"]
-            attachment_name = version["sg_uploaded_movie"]["name"]
-            url = self.sg.get_attachment_download_url(attachment_id, attachment_name)
-            local_path = self.path + attachment_name
-            urllib.request.urlretrieve(url, local_path)
+        for sid in self.selected_ids_filter:
+            version = self.sg.find_one(self.entity_type, [sid], version_fields)
+            local_path = self.path + '/' + version["sg_uploaded_movie"]["name"]
+            self.sg.download_attachment(version["sg_uploaded_movie"], file_path=local_path)
 
 
 def main():
