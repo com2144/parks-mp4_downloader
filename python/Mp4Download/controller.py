@@ -11,11 +11,21 @@ from view import DownLoadMainView
 from view import BrowseDialog
 from PySide2.QtWidgets import *
 import sys
-from shotgun_api3 import Shotgun
+import os
+import urllib.parse
+import urllib.request
+import logging as logger
+from shotgun_api3 import shotgun
 
 
 class DownLoadController:
     def __init__(self, main_window):
+        sg_act = ShotgunAction(sys.argv[1])
+        self.sg = sg_act.sg
+        self.entity_type = sg_act.entity_type
+        self.ids_filter = sg_act.ids_filter
+        self.ids = sg_act.ids
+
         model = DownLoadModel()
         self.main_window = main_window
         self.view = DownLoadMainView()
@@ -61,6 +71,7 @@ class DownLoadController:
             self.view.path_line_edit.setText(self.path)
 
     def on_ok_button_clicked(self):
+        self.download_url_file()
         self.show_warning('Mp4 file save!')
         self.browse_sig = False
 
@@ -71,13 +82,165 @@ class DownLoadController:
     def show_warning(error_message):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
-        msg_box.setWindowTitle("Warning")
+        msg_box.setWindowTitle("Done")
         msg_box.setText(f"{error_message}")
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.exec_()
 
+    def download_url_file(self):
+        version_fields = ["id", "sg_uploaded_movie"]
+        version = self.sg.find(self.entity_type, self.ids_filter, fields=version_fields)
+        if version and "sg_uploaded_movie" in version:
+            attachment_id = version["sg_uploaded_movie"]["id"]
+            attachment_name = version["sg_uploaded_movie"]["name"]
+            url = self.sg.get_attachment_download_url(attachment_id, attachment_name)
+            local_path = self.path + attachment_name
+            urllib.request.urlretrieve(url, local_path)
+
+
+class ShotgunActionException(Exception):
+    pass
+
+
+class ShotgunAction:
+    def __init__(self, url):
+        shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
+        scripts_name = "script psj"
+        scripts_key = "sck0fjGpgxoswuz)ibsnypzek"
+
+        self.sg = shotgun.Shotgun(shotgrid_url, script_name=scripts_name, api_key=scripts_key)
+
+        self.log_file = ''
+        self.log_file_setting()
+        self.logger = self._init_log(self.log_file)
+        self.url = url
+        self.protocol, self.action, self.params = self._parse_url()
+
+        # entity type that the page was displaying
+        self.entity_type = self.params["entity_type"]
+
+        # Project info (if the ActionMenuItem was launched from a page not belonging
+        # to a Project (Global Page, My Page, etc.), this will be blank
+        if "project_id" in self.params:
+            self.project = {
+                "id": int(self.params["project_id"]),
+                "name": self.params["project_name"],
+            }
+        else:
+            self.project = None
+
+        # Internal column names currently displayed on the page
+        self.columns = self.params["cols"]
+
+        # Human readable names of the columns currently displayed on the page
+        self.column_display_names = self.params["column_display_names"]
+
+        # All ids of the entities returned by the query (not just those visible on the page)
+        self.ids = []
+        if len(self.params["ids"]) > 0:
+            ids = self.params["ids"].split(",")
+            self.ids = [int(id) for id in ids]
+
+        # All ids of the entities returned by the query in filter format ready
+        # to use in a find() query
+        self.ids_filter = self._convert_ids_to_filter(self.ids)
+
+        # ids of entities that were currently selected
+        self.selected_ids = []
+        if len(self.params["selected_ids"]) > 0:
+            sids = self.params["selected_ids"].split(",")
+            self.selected_ids = [int(id) for id in sids]
+
+        # All selected ids of the entities returned by the query in filter format ready
+        # to use in a find() query
+        self.selected_ids_filter = self._convert_ids_to_filter(self.selected_ids)
+
+        # sort values for the page
+        # (we don't allow no sort anymore, but not sure if there's legacy here)
+        if "sort_column" in self.params:
+            self.sort = {
+                "column": self.params["sort_column"],
+                "direction": self.params["sort_direction"],
+            }
+        else:
+            self.sort = None
+
+        # title of the page
+        self.title = self.params["title"]
+
+        # user info who launched the ActionMenuItem
+        self.user = {"id": self.params["user_id"], "login": self.params["user_login"]}
+
+        # session_uuid
+        self.session_uuid = self.params["session_uuid"]
+
+    def log_file_setting(self):
+        log_dir = os.path.dirname(sys.argv[0]) + os.sep + 'action_log'
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        else:
+            self.log_file = log_dir + os.sep + 'shotgun_action.log'
+
+    def _init_log(self, filename='shotgun_action.log'):
+        try:
+            logger.basicConfig(
+                level=logger.DEBUG,
+                format="%(asctime)s %(levelname)-8s %(message)s",
+                datefmt="%Y-%b-%d %H:%M:%S",
+                filename=filename,
+                filemode="w+",
+            )
+        except IOError as e:
+            raise ShotgunActionException("Unable to open logfile for writing: %s" % e)
+        logger.info("ShotgunAction logging started.")
+        return logger
+
+    def _parse_url(self):
+        logger.info("Parsing full url received: %s" % self.url)
+
+        # get the protocol used
+        protocol, path = self.url.split(":", 1)
+        logger.info("protocol: %s" % protocol)
+
+        # extract the action
+        action, params = path.split("?", 1)
+        action = action.strip("/")
+        logger.info("action: %s" % action)
+
+        # extract the parameters
+        # 'column_display_names' and 'cols' occurs once for each column displayed so we store it as a list
+        params = params.split("&")
+        p = {"column_display_names": [], "cols": []}
+        for arg in params:
+            key, value = map(urllib.parse.unquote, arg.split("=", 1))
+            if key == "column_display_names" or key == "cols":
+                p[key].append(value)
+            else:
+                p[key] = value
+        params = p
+        logger.info("params: %s" % params)
+        return protocol, action, params
+
+        # ----------------------------------------------
+        # Convert IDs to filter format to us in find() queries
+        # ----------------------------------------------
+
+    def _convert_ids_to_filter(self, ids):
+        filter = []
+        for id in ids:
+            filter.append(["id", "is", id])
+        logger.debug("parsed ids into: %s" % filter)
+        return filter
+
 
 def main():
+    try:
+        sa = ShotgunAction(sys.argv[1])
+        logger.info("ShotgunAction: Firing... %s" % (sys.argv[1]))
+    except IndexError as e:
+        raise ShotgunActionException("Missing GET arguments")
+    logger.info("ShotgunAction process finished.")
+
     app = QApplication(sys.argv)
     window = QMainWindow()
     controller = DownLoadController(window)
