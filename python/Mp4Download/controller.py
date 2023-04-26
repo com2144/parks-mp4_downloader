@@ -1,8 +1,3 @@
-# You must install anaconda3 env name py3.7
-# The py3.7 pakage gat a PySide2, shotgun_api3
-# If you're os Window, You have to write regedit by HKEY_CLASSES_ROOT\shotgrid\shell\open\command and
-# "C:\Users\{user_name}\anaconda3\condabin\activate.bat" py3.7 && "python" "C:{your_path}\parks-mp4_downloader\python\Mp4Download\controller.py" "%1"
-
 # !/usr/bin/env python
 # :coding: utf-8
 
@@ -24,6 +19,7 @@ class ShotgunActionException(Exception):
 
 class DownLoadController:
     def __init__(self, main_window, url):
+        # url is variable
         shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
         scripts_name = "script_psj"
         scripts_key = "qJq9qnmuv*aaxqkulybgdymlr"
