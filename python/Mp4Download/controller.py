@@ -231,18 +231,19 @@ class DownLoadController:
 
 
 def main():
+    app = QApplication(sys.argv)
+    window = QMainWindow()
     try:
-        app = QApplication(sys.argv)
-        window = QMainWindow()
         controller = DownLoadController(window, sys.argv[1])
-        window.setCentralWidget(controller.view)
-        window.setWindowTitle('Mp4 Downloader')
-        window.show()
-        sys.exit(app.exec_())
         logger.info("ShotgunAction: Firing... %s" % (sys.argv[1]))
     except IndexError as e:
         raise ShotgunActionException("Missing GET arguments")
     logger.info("ShotgunAction process finished.")
+
+    window.setCentralWidget(controller.view)
+    window.setWindowTitle('Mp4 Downloader')
+    window.show()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
