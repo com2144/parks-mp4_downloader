@@ -1,0 +1,2 @@
+[HKEY_CLASSES_ROOT\ShotGrid\shell\open\command]
+"C:\Windows\System32\cmd.exe" "/k" "C:\{your_batchfile_path}\parks-mp4_downloader\connect.bat" "%1"
