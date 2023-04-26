@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # :coding: utf-8
+# You must install anaconda3 env name py3.7
+# The py3.7 pakage gat a PySide2, shotgun_api3
 
 from model import DownLoadModel
 from view import DownLoadMainView
@@ -40,6 +42,7 @@ class DownLoadController:
         self.view.cancel_button.clicked.connect(self.on_cancel_button_clicked)
 
         self.view.setLayout(self.view.main_vbox_layout)
+
     def on_browse_button_clicked(self):
         self.browse_sig = True
 
@@ -70,6 +73,7 @@ class DownLoadController:
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.exec_()
 
+
 def main():
     app = QApplication(sys.argv)
     window = QMainWindow()
@@ -78,19 +82,3 @@ def main():
     window.setWindowTitle('Mp4 Downloader')
     window.show()
     sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()
-
-# def main():
-#     app = QApplication()
-#     window = QMainWindow()
-#     controller = DownLoadController(window)
-#     window.setCentralWidget(controller.view)
-#     window.setWindowTitle('Mp4 Downloader')
-#     window.show()
-#     app.exec_()
-#
-# if __name__ == '__main__':
-#     main()
