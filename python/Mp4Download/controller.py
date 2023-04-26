@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-# :coding: utf-8
-
 # You must install anaconda3 env name py3.7
 # The py3.7 pakage gat a PySide2, shotgun_api3
-#If you're os Window, You have to write regedit by HKEY_CLASSES_ROOT\shotgrid\shell\open\command and
+# If you're os Window, You have to write regedit by HKEY_CLASSES_ROOT\shotgrid\shell\open\command and
 # "C:\Users\{user_name}\anaconda3\condabin\activate.bat" py3.7 && "python" "C:{your_path}\parks-mp4_downloader\python\Mp4Download\controller.py" "%1"
+
+# !/usr/bin/env python
+# :coding: utf-8
 
 from model import DownLoadModel
 from view import DownLoadMainView
@@ -85,3 +85,7 @@ def main():
     window.setWindowTitle('Mp4 Downloader')
     window.show()
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
