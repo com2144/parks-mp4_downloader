@@ -5,14 +5,30 @@ class DownLoadMainView(QWidget):
     def __init__(self):
         super().__init__()
         self.path_line_edit = QLineEdit()
+        self.path_line_edit.setStyleSheet("background-color: rgb(90, 90, 90);")
+        self.path_line_edit.setFixedSize(350, 35)
         self.browse_button = QPushButton('Browse')
+        self.browse_button.setStyleSheet("width: 70px; height: 30px;")
         self.path_hbox_layout = QHBoxLayout()
 
         self.ok_button = QPushButton('OK')
+        self.ok_button.setStyleSheet("width: 70px; height: 30px;")
         self.cancel_button = QPushButton('cancel')
+        self.cancel_button.setStyleSheet("width: 70px; height: 30px;")
         self.user_controller_btn_hbox_layout = QHBoxLayout()
 
         self.main_vbox_layout = QVBoxLayout()
+        widget_default_style = """
+        QWidget{
+            border: 2px solid grey;
+            border-radius: 5px;
+            text-align: center;
+            font: 11pt\"Courier New\";
+            background-color: rgb(45, 45, 45);
+            color: rgb(225, 225, 225)
+        }
+        """
+        self.setStyleSheet(widget_default_style)
 
     def test_ui(self):
         self.path_line_edit.setPlaceholderText("Select the save folder")
@@ -62,6 +78,8 @@ def main():
     window = QMainWindow()
     window.setCentralWidget(test_ui)
     window.setWindowTitle('Mp4 Downloader')
+    window.setFixedSize(500, 150)
+    window.setStyleSheet("background-color: rgb(50, 50, 50);")
     window.show()
     app.exec_()
 

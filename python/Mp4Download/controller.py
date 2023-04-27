@@ -2,8 +2,7 @@
 # :coding: utf-8
 
 from model import DownLoadModel
-from view import DownLoadMainView
-from view import BrowseDialog
+from view import *
 from PySide2.QtWidgets import *
 import sys
 import os
@@ -26,6 +25,7 @@ class DownLoadController:
         self.logger = self._init_log(self.log_file)
         self.url = url
         self.protocol, self.action, self.params = self._parse_url()
+
         self.entity_type = ''
         self.selected_ids = ''
         self.selected_ids_filter = []
@@ -193,6 +193,8 @@ def main():
 
     window.setCentralWidget(controller.view)
     window.setWindowTitle('Mp4 Downloader')
+    window.setFixedSize(500, 150)
+    window.setStyleSheet("background-color: rgb(50, 50, 50);")
     window.show()
     sys.exit(app.exec_())
 
