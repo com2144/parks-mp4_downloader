@@ -43,6 +43,8 @@ class DownLoadMainView(QWidget):
     @staticmethod
     def test_cancel_clicked():
         print("end to find directory")
+
+
 class BrowseDialog(QFileDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -62,6 +64,7 @@ def main():
     window.setWindowTitle('Mp4 Downloader')
     window.show()
     app.exec_()
+
 
 if __name__ == '__main__':
     main()
