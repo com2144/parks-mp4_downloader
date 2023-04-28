@@ -4,17 +4,30 @@ from PySide2.QtWidgets import *
 class DownLoadMainView(QWidget):
     def __init__(self):
         super().__init__()
+        button_style = """
+        QPushButton{
+            width: 70px; height: 30px;
+            background-color: rgb(40, 40, 40);
+            color: rgb(225, 225, 225)        
+        }
+        QPushButton:hover{
+            background-color: rgb(70, 70, 70);        
+        }
+        QPushButton:pressed{
+            background-color: rgb(30, 30, 30);
+        }
+        """
         self.path_line_edit = QLineEdit()
         self.path_line_edit.setStyleSheet("background-color: rgb(90, 90, 90);")
         self.path_line_edit.setFixedSize(350, 35)
         self.browse_button = QPushButton('Browse')
-        self.browse_button.setStyleSheet("width: 70px; height: 30px;")
+        self.browse_button.setStyleSheet(button_style)
         self.path_hbox_layout = QHBoxLayout()
 
         self.ok_button = QPushButton('OK')
-        self.ok_button.setStyleSheet("width: 70px; height: 30px;")
+        self.ok_button.setStyleSheet(button_style)
         self.cancel_button = QPushButton('cancel')
-        self.cancel_button.setStyleSheet("width: 70px; height: 30px;")
+        self.cancel_button.setStyleSheet(button_style)
         self.user_controller_btn_hbox_layout = QHBoxLayout()
 
         self.main_vbox_layout = QVBoxLayout()
