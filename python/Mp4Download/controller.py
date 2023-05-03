@@ -206,8 +206,13 @@ class DownLoadController:
         version_fields = ["id", "sg_uploaded_movie"]
         for sid in self.selected_ids_filter:
             version = self.sg.find_one(self.entity_type, [sid], version_fields)
-            self.path = self.path + '/' + version["sg_uploaded_movie"]["name"]
-            self.sg.download_attachment(version["sg_uploaded_movie"], file_path=self.path)
+            mp4_down = self.path + '/' + version["sg_uploaded_movie"]["name"]
+            mp4_filter = mp4_down.split('.')
+            low_ext = mp4_filter[-1].lower()
+            if low_ext != 'mp4':
+                pass
+            else:
+                self.sg.download_attachment(version["sg_uploaded_movie"], file_path=mp4_down)
 
 
 class ShotgunActionException(Exception):
