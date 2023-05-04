@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # :coding: utf-8
 
-from model import DownLoadModel
+from model import *
 from view import *
 from action_handler import *
 from PySide2.QtWidgets import *
@@ -12,37 +12,21 @@ import os
 class DownLoadController:
     def __init__(self, main_window, argv):
 
-        self.action = ActionHandler(argv)
-
-        model = DownLoadModel()
+        self.model = DownLoadModel(argv)
+        self.action = self.model.action
         self.main_window = main_window
         self.view = DownLoadMainView()
 
         self.dialog = None
 
-        self.path = model.path
+        self.path = self.model.path
 
         self.browse_sig = False
 
-        self.main_ui()
-
-    def main_ui(self):
-        self.view.path_line_edit.setPlaceholderText("Select the save folder")
-
-        self.view.path_hbox_layout.addWidget(self.view.path_line_edit)
-        self.view.path_hbox_layout.addWidget(self.view.browse_button)
-        self.view.main_vbox_layout.addLayout(self.view.path_hbox_layout)
-
+        self.view.main_ui()
         self.view.browse_button.clicked.connect(self.on_browse_button_clicked)
-
-        self.view.user_controller_btn_hbox_layout.addWidget(self.view.ok_button)
-        self.view.user_controller_btn_hbox_layout.addWidget(self.view.cancel_button)
-        self.view.main_vbox_layout.addLayout(self.view.user_controller_btn_hbox_layout)
-
         self.view.ok_button.clicked.connect(self.on_ok_button_clicked)
         self.view.cancel_button.clicked.connect(self.on_cancel_button_clicked)
-
-        self.view.setLayout(self.view.main_vbox_layout)
 
     def on_browse_button_clicked(self):
         self.browse_sig = True
@@ -59,7 +43,7 @@ class DownLoadController:
             self.view.path_line_edit.setText(self.path)
 
     def on_ok_button_clicked(self):
-        self.download_url_file()
+        self.model.download_url_file()
         if os.path.exists(self.path):
             self.show_warning('Mp4 files save!')
         else:
@@ -112,17 +96,17 @@ class DownLoadController:
         msg_box.setStyleSheet(warning_box_style)
         msg_box.exec_()
 
-    def download_url_file(self):
-        version_fields = ["id", "sg_uploaded_movie"]
-        for sid in self.action.selected_ids_filter:
-            version = self.action.sg.find_one(self.action.entity_type, [sid], version_fields)
-            mp4_down = self.path + '/' + version["sg_uploaded_movie"]["name"]
-            mp4_filter = mp4_down.split('.')
-            low_ext = mp4_filter[-1].lower()
-            if low_ext != 'mp4':
-                pass
-            else:
-                self.action.sg.download_attachment(version["sg_uploaded_movie"], file_path=mp4_down)
+    # def download_url_file(self):
+    #     version_fields = ["id", "sg_uploaded_movie"]
+    #     for sid in self.action.selected_ids_filter:
+    #         version = self.action.sg.find_one(self.action.entity_type, [sid], version_fields)
+    #         mp4_down = self.path + '/' + version["sg_uploaded_movie"]["name"]
+    #         mp4_filter = mp4_down.split('.')
+    #         low_ext = mp4_filter[-1].lower()
+    #         if low_ext != 'mp4':
+    #             pass
+    #         else:
+    #             self.action.sg.download_attachment(version["sg_uploaded_movie"], file_path=mp4_down)
 
 
 def main():

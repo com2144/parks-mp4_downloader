@@ -43,21 +43,21 @@ class DownLoadMainView(QWidget):
         """
         self.setStyleSheet(widget_default_style)
 
-    def test_ui(self):
+    def main_ui(self):
         self.path_line_edit.setPlaceholderText("Select the save folder")
 
         self.path_hbox_layout.addWidget(self.path_line_edit)
         self.path_hbox_layout.addWidget(self.browse_button)
         self.main_vbox_layout.addLayout(self.path_hbox_layout)
 
-        self.browse_button.clicked.connect(self.test_browse_clicked)
+        # self.browse_button.clicked.connect(self.test_browse_clicked)
 
         self.user_controller_btn_hbox_layout.addWidget(self.ok_button)
         self.user_controller_btn_hbox_layout.addWidget(self.cancel_button)
         self.main_vbox_layout.addLayout(self.user_controller_btn_hbox_layout)
 
-        self.ok_button.clicked.connect(self.test_ok_clicked)
-        self.cancel_button.clicked.connect(self.test_cancel_clicked)
+        # self.ok_button.clicked.connect(self.test_ok_clicked)
+        # self.cancel_button.clicked.connect(self.test_cancel_clicked)
 
         self.setLayout(self.main_vbox_layout)
 
@@ -87,7 +87,7 @@ class BrowseDialog(QFileDialog):
 def main():
     app = QApplication()
     test_ui = DownLoadMainView()
-    test_ui.test_ui()
+    test_ui.main_ui()
     window = QMainWindow()
     window.setCentralWidget(test_ui)
     window.setWindowTitle('Mp4 Downloader')
