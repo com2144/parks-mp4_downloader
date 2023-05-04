@@ -65,8 +65,8 @@ class ActionHandler:
             # to use in a find() query
             self.selected_ids_filter = self._convert_ids_to_filter(self.selected_ids)
         else:
-            raise IndexError("Wrong action menu name")
-        self.log.info("ShotgunAction process finished.")
+            self.log.info("Incorrect action menu name")
+            raise IndexError("Incorrect action menu name")
 
     def _convert_ids_to_filter(self, idents):
         filter_list = []

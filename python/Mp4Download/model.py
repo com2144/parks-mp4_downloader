@@ -1,4 +1,4 @@
-from action_handler import ActionHandler
+from action_handler import *
 import sys
 
 
@@ -21,9 +21,12 @@ class DownLoadModel:
 
 
 def main():
-    test = DownLoadModel(sys.argv)
-    test.path = '/home/west/바탕화면/test'
-    test.download_url_file(test.path)
+    try:
+        test = DownLoadModel(sys.argv)
+        test.path = '/home/west/바탕화면/test'
+        test.download_url_file(test.path)
+    except IndexError as e:
+        raise ShotgunActionException("Missing GET arguments")
 
 
 if __name__ == '__main__':
