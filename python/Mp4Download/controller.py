@@ -13,7 +13,7 @@ class DownLoadController:
     def __init__(self, main_window, argv):
 
         self.model = DownLoadModel(argv)
-        self.action = self.model.action
+        self.action = self.model.action_handle.action
         self.main_window = main_window
         self.view = DownLoadMainView()
 
@@ -43,7 +43,7 @@ class DownLoadController:
             self.view.path_line_edit.setText(self.path)
 
     def on_ok_button_clicked(self):
-        self.model.download_url_file()
+        self.model.download_url_file(self.path)
         if os.path.exists(self.path):
             self.show_warning('Mp4 files save!')
         else:
@@ -96,28 +96,16 @@ class DownLoadController:
         msg_box.setStyleSheet(warning_box_style)
         msg_box.exec_()
 
-    # def download_url_file(self):
-    #     version_fields = ["id", "sg_uploaded_movie"]
-    #     for sid in self.action.selected_ids_filter:
-    #         version = self.action.sg.find_one(self.action.entity_type, [sid], version_fields)
-    #         mp4_down = self.path + '/' + version["sg_uploaded_movie"]["name"]
-    #         mp4_filter = mp4_down.split('.')
-    #         low_ext = mp4_filter[-1].lower()
-    #         if low_ext != 'mp4':
-    #             pass
-    #         else:
-    #             self.action.sg.download_attachment(version["sg_uploaded_movie"], file_path=mp4_down)
-
 
 def main():
     app = QApplication(sys.argv)
     window = QMainWindow()
     try:
         controller = DownLoadController(window, sys.argv)
-        controller.action.log.info("ShotgunAction: Firing... %s" % (sys.argv[1]))
+        controller.model.action_handle.log.info("ShotgunAction: Firing... %s" % (sys.argv[1]))
     except IndexError as e:
         raise ShotgunActionException("Missing GET arguments")
-    controller.action.log.info("ShotgunAction process finished.")
+    controller.model.action_handle.log.info("ShotgunAction process finished.")
     window.setCentralWidget(controller.view)
     window.setWindowTitle('Mp4 Downloader')
     window.setFixedSize(500, 150)

@@ -17,7 +17,7 @@ class ActionHandler:
         self.log = self._init_log(self.log_file)
 
         self.url = argv[1]
-        self.protocol, self.action, self.params = self._parse_url()
+        self.action, self.params = self._parse_url()
 
         self.entity_type = ''
         self.selected_ids = ''
@@ -49,7 +49,7 @@ class ActionHandler:
                 p[key] = value
         params = p
         self.log.info("params: %s" % params)
-        return protocol, action, params
+        return action, params
 
     def init_set(self, action):
         if action == 'mp4_download':

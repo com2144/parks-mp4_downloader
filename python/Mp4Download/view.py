@@ -50,14 +50,14 @@ class DownLoadMainView(QWidget):
         self.path_hbox_layout.addWidget(self.browse_button)
         self.main_vbox_layout.addLayout(self.path_hbox_layout)
 
-        # self.browse_button.clicked.connect(self.test_browse_clicked)
+        self.browse_button.clicked.connect(self.test_browse_clicked)
 
         self.user_controller_btn_hbox_layout.addWidget(self.ok_button)
         self.user_controller_btn_hbox_layout.addWidget(self.cancel_button)
         self.main_vbox_layout.addLayout(self.user_controller_btn_hbox_layout)
 
-        # self.ok_button.clicked.connect(self.test_ok_clicked)
-        # self.cancel_button.clicked.connect(self.test_cancel_clicked)
+        self.ok_button.clicked.connect(self.test_ok_clicked)
+        self.cancel_button.clicked.connect(self.test_cancel_clicked)
 
         self.setLayout(self.main_vbox_layout)
 
