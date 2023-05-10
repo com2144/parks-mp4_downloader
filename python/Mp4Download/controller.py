@@ -1,9 +1,9 @@
 # !/usr/bin/env python
 # :coding: utf-8
 
-from model import *
-from view import *
-from action_handler import *
+from Mp4Download.model import *
+from Mp4Download.view import *
+from Mp4Download.action_handler import *
 from PySide2.QtWidgets import *
 import sys
 import os
