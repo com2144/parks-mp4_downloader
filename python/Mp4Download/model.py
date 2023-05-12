@@ -23,7 +23,7 @@ class DownLoadModel:
 def main():
     try:
         test = DownLoadModel(sys.argv)
-        test.path = '/home/west/바탕화면/test'
+        test.path = '/home/west/바탕화면'
         test.download_url_file(test.path)
     except IndexError as e:
         raise ShotgunActionException("Missing GET arguments")

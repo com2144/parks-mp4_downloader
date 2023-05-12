@@ -3,7 +3,6 @@
 
 from model import *
 from view import *
-from action_handler import *
 from PySide2.QtWidgets import *
 import sys
 import os
