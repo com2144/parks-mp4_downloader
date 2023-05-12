@@ -64,8 +64,9 @@ class ActionHandler:
             # All selected ids of the entities returned by the query in filter format ready
             # to use in a find() query
             self.selected_ids_filter = self._convert_ids_to_filter(self.selected_ids)
+            self.log.info("'%s' correct action menu name" % action)
         else:
-            self.log.info("Incorrect action menu name")
+            self.log.info("'%s' Incorrect action menu name" % action)
             raise IndexError("Incorrect action menu name")
 
     def _convert_ids_to_filter(self, idents):
