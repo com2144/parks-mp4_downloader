@@ -19,12 +19,12 @@ pause
 1. cd ~/.local/share/applications
 2.  make shotgrid.desktop
 3.  [Desktop Entry]
-Type=Application
-Terminal=True
-Name=shotgrid
+Type=Application.
+Terminal=True.
+Name=shotgrid.
 Exec=/{your_path}/anaconda3/envs/py3.7/bin/python /{your_path}/parks-mp4_downloader/python/Mp4Download/view.py %u
-Categories=Application
-MimeType=x-scheme-handler/shotgrid
-NoDisplay=Ture
+Categories=Application.
+MimeType=x-scheme-handler/shotgrid.
+NoDisplay=Ture.
 
 4. update-desktop-database ~/.local/share/applications
