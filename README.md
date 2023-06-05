@@ -1,7 +1,7 @@
 # parks-mp4_downloader
 ## mp4 downloader used shotgrid ami
 - You must install anaconda3 env name py3.7
-- The py3.7 pakage gat a PySide2, shotgun_api3
+- The py3.7 pakage get a PySide2, shotgun_api3
 
 ## initial registry setup
 - https://developer.shotgridsoftware.com/ko/af0c94ce/#registering-a-protocol-on-windows
