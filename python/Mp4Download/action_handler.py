@@ -6,9 +6,9 @@ from shotgun_api3 import shotgun
 
 class ActionHandler:
     def __init__(self, argv):
-        shotgrid_url = "https://rndtest.shotgrid.autodesk.com/"
-        scripts_name = "script_psj"
-        scripts_key = "qdpnuwopyWqshuy-p0nbowmks"
+        shotgrid_url = "your_shotgrid_url"
+        scripts_name = "your_script_name"
+        scripts_key = "your_script_key"
 
         self.sg = shotgun.Shotgun(shotgrid_url, script_name=scripts_name, api_key=scripts_key)
 
